@@ -1,0 +1,6 @@
+﻿  main.cpp
+C:\Users\kelly\source\repos\SDLProject\main.cpp(48,28): warning C4244: 'initializing': conversion from 'double' to 'int', possible loss of data
+C:\Users\kelly\source\repos\SDLProject\main.cpp(49,29): warning C4244: 'initializing': conversion from 'double' to 'int', possible loss of data
+C:\Users\kelly\source\repos\SDLProject\main.cpp(50,30): warning C4244: 'initializing': conversion from 'double' to 'int', possible loss of data
+C:\Users\kelly\source\repos\SDLProject\main.cpp(51,32): warning C4244: 'initializing': conversion from 'double' to 'int', possible loss of data
+  SDLProject.vcxproj -> C:\Users\kelly\source\repos\SDLProject\Debug\SDLProject.exe
