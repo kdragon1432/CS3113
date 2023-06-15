@@ -152,7 +152,7 @@ void initialize() {
     glUseProgram(program2.programID);
     glClearColor(BG_RED, BG_BLUE, BG_GREEN, BG_OPACITY);
     glEnable(GL_BLEND);
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA); 
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);  
 
 }
 
