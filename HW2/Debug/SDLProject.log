@@ -1,2 +1,8 @@
 ﻿  main.cpp
+C:\Users\kelly\Documents\GitHub\CS3113\HW2\main.cpp(309,17): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
+C:\Users\kelly\Documents\GitHub\CS3113\HW2\main.cpp(310,17): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
+C:\Users\kelly\Documents\GitHub\CS3113\HW2\main.cpp(311,17): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
+C:\Users\kelly\Documents\GitHub\CS3113\HW2\main.cpp(312,17): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
+C:\Users\kelly\Documents\GitHub\CS3113\HW2\main.cpp(313,11): warning C4804: '<': unsafe use of type 'bool' in operation
+C:\Users\kelly\Documents\GitHub\CS3113\HW2\main.cpp(318,16): warning C4804: '<': unsafe use of type 'bool' in operation
   SDLProject.vcxproj -> C:\Users\kelly\Documents\GitHub\CS3113\HW2\Debug\SDLProject.exe

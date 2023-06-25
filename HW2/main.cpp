@@ -20,9 +20,9 @@ const int	WINDOW_WIDTH = 640,
 WINDOW_HEIGHT = 480;
 
 // Background Color: WHITE
-const float		BG_RED = 1.0f,
-BG_BLUE = 1.0f,
-BG_GREEN = 1.0f,
+const float		BG_RED = 0.9f,
+BG_BLUE = 0.9f,
+BG_GREEN = 0.9f,
 BG_OPACITY = 1.0f;
 
 // Our viewport—or our "camera"'s—position and dimensions
@@ -54,30 +54,33 @@ GLuint ball_texture_id;
 glm::vec3 ball_position = glm::vec3(0.0f, 0.0f, 0.0f);
 glm::vec3 ball_movement = glm::vec3(0.0f, 0.0f, 0.0f);
 
-glm::vec3 ball_orientation = glm::vec3(0.0f, 0.0f, 0.0f);
-glm::vec3 ball_rotation = glm::vec3(0.0f, 0.0f, 0.0f);
-
 ShaderProgram p1;
 glm::mat4 p1_view, p1_matrix, p1_projection;
 const char PLAYER1_SPRITE_FILEPATH[] = "player1.png";
 GLuint p1_texture_id;
-
+glm::vec3 p1_initial = glm::vec3(-3.5f, 0.0f, 0.0f);
 glm::vec3 p1_position = glm::vec3(0.0f, 0.0f, 0.0f);
 glm::vec3 p1_movement = glm::vec3(0.0f, 0.0f, 0.0f);
 
-glm::vec3 p1_orientation = glm::vec3(0.0f, 0.0f, 0.0f);
-glm::vec3 p1_rotation = glm::vec3(0.0f, 0.0f, 0.0f);
 
 ShaderProgram p2;
 glm::mat4 p2_view, p2_matrix, p2_projection;
 const char PLAYER2_SPRITE_FILEPATH[] = "player2.png";
 GLuint p2_texture_id;
-
+glm::vec3 p2_initial = glm::vec3(3.5f, 0.0f, 0.0f);
 glm::vec3 p2_position = glm::vec3(0.0f, 0.0f, 0.0f);
 glm::vec3 p2_movement = glm::vec3(0.0f, 0.0f, 0.0f);
 
-glm::vec3 p2_orientation = glm::vec3(0.0f, 0.0f, 0.0f);
-glm::vec3 p2_rotation = glm::vec3(0.0f, 0.0f, 0.0f);
+
+
+//WALL LOCATIONS
+glm::vec3 wallUp_position = glm::vec3(0.0f, 3.0f, 0.0f);
+glm::vec3 wallDown_position = glm::vec3(0.0f, -3.0f, 0.0f);
+glm::vec3 wallLeft_position = glm::vec3(-5.0f, 0.0f, 0.0f);
+glm::vec3 wallRight_position = glm::vec3(5.0f, 0.0f, 0.0f);
+
+
+
 
 
 
@@ -153,8 +156,6 @@ void initialize() {
 	p2.SetViewMatrix(p2_view);
 
 
-	//p1.SetColor(1.0f, 0.4f, 0.4f, 1.0f);
-
 	// Each object has its own unique ID
 	glUseProgram(BALL.programID);
 	glUseProgram(p1.programID);
@@ -170,7 +171,20 @@ void initialize() {
 	// enable blending
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+
+	/// set random direction
+	if ((rand() % 10) >= 1) {
+		ball_movement.x = (rand() % 10) * 0.1f;
+	}
+	else { ball_movement.x = (rand() % 10) * -0.1f; }
+	if ((rand() % 10) >= 1) {
+		ball_movement.y = (rand() % 10) * -0.1f;
+	}
+	else { ball_movement.y = (rand() % 10) * 0.1f; }
 }
+
+
 
 void process_input(){
 	SDL_Event event;
@@ -244,15 +258,72 @@ void process_input(){
 }
 
 
+
+
 int frame_counter = 0;
+int rand_num = rand() % 40;
 float previous_ticks = 0;
 float player_speed = 5.0f;  // move 1 unit per second
-//const float ROT_ANGLE = glm::radians(90.0f);
+const float ROT_ANGLE = glm::radians(90.0f);
 void update() {
+	frame_counter += 1;
+	float Up_p1 = wallUp_position.y - p1_position.y;
+	if (Up_p1 <= 0) {
+		p1_movement.y = 0.0f;
+		p1_position.y = 2.8f;
+	}
+	float Down_p1 = wallDown_position.y - p1_position.y;
+	if (Down_p1 >= 0) {
+		p1_movement.y = 0.0f;
+		p1_position.y = -2.8f;
+	}
+	float Up_p2 = wallUp_position.y - p2_position.y;
+	if (Up_p2 <= 0) {
+		p2_movement.y = 0.0f;
+		p2_position.y = 2.8f;
+	}
+	float Down_p2 = wallDown_position.y - p2_position.y;
+	if (Down_p2 >= 0) {
+		p2_movement.y = 0.0f;
+		p2_position.y = -2.8f;
+	}
+	float Up_Ball = wallUp_position.y - ball_position.y;
+	if (Up_Ball <= 0) {
+		ball_movement.y *= -1.0f;
+		//ball_position.y = 2.8f;
+	}
+	float Down_Ball = wallDown_position.y - ball_position.y;
+	if (Down_Ball >= 0) {
+		ball_movement.y *= -1.0f;
+		//ball_position.y = 2.8f;
+	}
+
+	if (wallLeft_position.x >= ball_position.x) {
+		ball_movement.x = 0.0f;
+		ball_movement.y = 0.0f;
+	}
+	if (wallRight_position.x <= ball_position.x) {
+		ball_movement.x = 0.0f;
+		ball_movement.y = 0.0f;
+	}
+	float p2_Ballx = sqrt(pow((p2_initial.x - ball_position.x), 2));
+	float p1_Ballx = sqrt(pow((p1_initial.x - ball_position.x), 2));
+	float p2_Bally = sqrt(pow((p2_position.y - ball_position.y), 2));
+	float p1_Bally = sqrt(pow((p1_position.y - ball_position.y), 2));
+	if (0.4f < p2_Ballx < 0.5f) {
+		if (p2_Bally < 1.0f) {
+			ball_movement.x *= -1;
+		}
+	}
+	else if (0.4f < p1_Ballx < 0.5f) {
+		if (p1_Bally < 1.0f) {
+			ball_movement.x *= -1;
+		}
+	}
+
 	float ticks = (float)SDL_GetTicks() / 1000.0f;  // get the current number of ticks
 	float delta_time = ticks - previous_ticks;
 	previous_ticks = ticks;
-	
 
 	// Add direction * units per second * elapsed time
 	p2_position += p2_movement * player_speed * delta_time;
@@ -263,7 +334,15 @@ void update() {
 	p1_matrix = glm::mat4(1.0f);
 	p1_matrix = glm::translate(p1_matrix, p1_position);
 
-	//model_matrix = glm::rotate(model_matrix, (ROT_ANGLE * delta_time), glm::vec3(0.0f, 0.0f, 1.0f));
+	
+	ball_position += ball_movement * player_speed * delta_time;
+	ball_matrix = glm::mat4(1.0f);
+	ball_matrix = glm::translate(ball_matrix, ball_position);
+
+	if (frame_counter < rand_num) {
+		ball_matrix = glm::rotate(ball_matrix, (ROT_ANGLE), glm::vec3(0.0f, 0.0f, 1.0f));
+	}
+	else { frame_counter = rand_num; }
 
 }
 
@@ -300,15 +379,15 @@ void render() {
 
 	float vertices1[] =
 	{
-		-4.9f, 0.0f, 
-		-4.5f, -1.0f, 
-		-4.5f, 1.0f,
+		-4.0f, 0.0f, 
+		-3.4f, -1.0f, 
+		-3.4f, 1.0f,
 	};
 
 	float texture_coordinates1[] = {
-		0.0f, 0.5f, 
-		0.4f, 0.0f, 
-		0.4f, 0.1f, 
+		0.4f, 0.5f, 
+		1.0f, 0.0f, 
+		1.0f, 1.0f, 
 
 	};
 
@@ -325,15 +404,15 @@ void render() {
 
 	float vertices2[] =
 	{
-		4.9f, 0.0f,
-		4.5f, -1.0f,
-		4.5f, 1.0f,
+		4.0f, 0.0f,
+		3.4f, -1.0f,
+		3.4f, 1.0f,
 	};
 
 	float texture_coordinates2[] = {
-		1.0f, 0.5f,
-		0.6f, 0.0f,
-		0.6f, 0.1f,
+		0.6f, 0.5f,
+		0.0f, 0.0f,
+		0.0f, 1.0f,
 
 	};
 
@@ -345,6 +424,10 @@ void render() {
 	glDrawArrays(GL_TRIANGLES, 0, 3);
 	glDisableVertexAttribArray(p2.positionAttribute);
 	glDisableVertexAttribArray(p2.texCoordAttribute);
+
+
+
+
 
 	SDL_GL_SwapWindow(displayWindow);
 
