@@ -47,9 +47,29 @@ bool gameIsRunning = true;
 
 
 ShaderProgram BALL;
-glm::mat4 view_matrix, model_matrix, projection_matrix;
+glm::mat4 ball_view, ball_matrix, ball_projection;
 const char BALL_SPRITE_FILEPATH[] = "ball.png";
 GLuint ball_texture_id;
+
+glm::vec3 ball_position = glm::vec3(0.0f, 0.0f, 0.0f);
+glm::vec3 ball_movement = glm::vec3(0.0f, 0.0f, 0.0f);
+
+glm::vec3 ball_orientation = glm::vec3(0.0f, 0.0f, 0.0f);
+glm::vec3 ball_rotation = glm::vec3(0.0f, 0.0f, 0.0f);
+
+ShaderProgram p1;
+glm::mat4 p1_view, p1_matrix, p1_projection;
+
+glm::vec3 p1_position = glm::vec3(0.0f, 0.0f, 0.0f);
+glm::vec3 p1_movement = glm::vec3(0.0f, 0.0f, 0.0f);
+
+glm::vec3 p1_orientation = glm::vec3(0.0f, 0.0f, 0.0f);
+glm::vec3 p1_rotation = glm::vec3(0.0f, 0.0f, 0.0f);
+
+
+
+
+
 
 const int NUMBER_OF_TEXTURES = 1; // to be generated, that is
 const GLint LEVEL_OF_DETAIL = 0;  // base image level; Level n is the nth mipmap reduction image
@@ -98,19 +118,27 @@ void initialize() {
 	glViewport(VIEWPORT_X, VIEWPORT_Y, VIEWPORT_WIDTH, VIEWPORT_HEIGHT);
 	// LOAD UP OUR SHADERS
 	BALL.Load(VT_SHADER_PATH, FT_SHADER_PATH);
+	p1.Load(V_SHADER_PATH, F_SHADER_PATH);
 
 	// Initialise our view, model, and projection matrices
-	view_matrix = glm::mat4(1.0f);  
-	model_matrix = glm::mat4(1.0f); 
-	projection_matrix = glm::ortho(-5.0f, 5.0f, -3.75f, 3.75f, -1.0f, 1.0f);
+	ball_view = glm::mat4(1.0f);  
+	ball_matrix = glm::mat4(1.0f); 
+	ball_projection = glm::ortho(-5.0f, 5.0f, -3.75f, 3.75f, -1.0f, 1.0f);
+	p1_view = glm::mat4(1.0f);
+	p1_matrix = glm::mat4(1.0f);
+	p1_projection = glm::ortho(-5.0f, 5.0f, -3.75f, 3.75f, -1.0f, 1.0f);
 
-	BALL.SetProjectionMatrix(projection_matrix);
-	BALL.SetViewMatrix(view_matrix);
-	// Notice we haven't set our model matrix yet!
-	//program.SetColor(1.0f, 0.4f, 0.4f, 1.0f);
+	BALL.SetProjectionMatrix(ball_projection);
+	BALL.SetViewMatrix(ball_view);
+	p1.SetProjectionMatrix(p1_projection);
+	p1.SetViewMatrix(p1_view);
+
+
+	p1.SetColor(1.0f, 0.4f, 0.4f, 1.0f);
 
 	// Each object has its own unique ID
 	glUseProgram(BALL.programID);
+	glUseProgram(p1.programID);
 
 
 	glClearColor(BG_RED, BG_BLUE, BG_GREEN, BG_OPACITY); // Background: WHITE
@@ -122,27 +150,90 @@ void initialize() {
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 }
 
-void process_input() {
+void process_input(){
 	SDL_Event event;
 	while (SDL_PollEvent(&event)) {
-		// NO INPUT
-		if (event.type == SDL_QUIT || event.type == SDL_WINDOWEVENT_CLOSE) {
-			gameIsRunning = false;
+		switch (event.type) {
+			case SDL_QUIT:
+			case SDL_WINDOWEVENT_CLOSE:
+				gameIsRunning = false;
+				break;
+			case SDL_KEYDOWN:
+				switch (event.key.keysym.sym) {
+				case SDLK_UP:
+					ball_movement.y = 1.0f;
+					break;
+				case SDLK_DOWN:
+					ball_movement.y = -1.0f;
+					break;
+				case SDLK_w:
+					ball_movement.y = 1.0f;
+					break;
+				case SDLK_s:
+					ball_movement.y = -1.0f;
+					break;
+				default:
+					break;
+				}
+			case SDL_KEYUP:
+				switch (event.key.keysym.sym) {
+				case SDLK_UP:
+					ball_movement.y = 0.0f;
+					break;
+				case SDLK_DOWN:
+					ball_movement.y = 0.0f;
+					break;
+				case SDLK_w:
+					ball_movement.y = 0.0f;
+					break;
+				case SDLK_s:
+					ball_movement.y = 0.0f;
+					break;
+				default:
+					break;
+				}
+			default:
+				break;
 		}
 	}
+	const Uint8* key_state = SDL_GetKeyboardState(NULL);
 
+	if (key_state[SDL_SCANCODE_UP]) {
+		ball_movement.y = 1.0f;
+	}
+	else if (key_state[SDL_SCANCODE_DOWN]) {
+		ball_movement.y = -1.0f;
+	}
+	if (key_state[SDL_SCANCODE_W])
+	{
+		ball_movement.y = 1.0f;
+	}
+	else if (key_state[SDL_SCANCODE_S]){
+		ball_movement.y = -1.0f;
+	}
+
+	// This makes sure that the player can't "cheat" their way into moving faster
+	if (glm::length(ball_movement) > 1.0f){
+		ball_movement = glm::normalize(ball_movement);
+	}
 }
 
 
 int frame_counter = 0;
 float previous_ticks = 0;
+float player_speed = 5.0f;  // move 1 unit per second
 //const float ROT_ANGLE = glm::radians(90.0f);
 void update() {
 	float ticks = (float)SDL_GetTicks() / 1000.0f;  // get the current number of ticks
 	float delta_time = ticks - previous_ticks;
 	previous_ticks = ticks;
-	glm::vec3 scale_vector;
-	//frame_counter += 1;
+	
+
+	// Add direction * units per second * elapsed time
+	ball_position += ball_movement * player_speed * delta_time;
+
+	ball_matrix = glm::mat4(1.0f);
+	ball_matrix = glm::translate(ball_matrix, ball_position);
 
 	//model_matrix = glm::rotate(model_matrix, (ROT_ANGLE * delta_time), glm::vec3(0.0f, 0.0f, 1.0f));
 
@@ -151,7 +242,7 @@ void update() {
 void render() {
 	glClear(GL_COLOR_BUFFER_BIT);
 
-	BALL.SetModelMatrix(model_matrix);
+	BALL.SetModelMatrix(ball_matrix);
 
 	float vertices[] =
 	{
@@ -177,7 +268,22 @@ void render() {
 	glDisableVertexAttribArray(BALL.positionAttribute);
 	glDisableVertexAttribArray(BALL.texCoordAttribute);
 
+	p1.SetModelMatrix(p1_matrix);
+
+	float vertices1[] =
+	{
+		-4.9f, 0.0f, 
+		-4.5f, -1.0f, 
+		-4.5f, 1.0f,
+	};
+
+	glVertexAttribPointer(p1.positionAttribute, 2, GL_FLOAT, false, 0, vertices1);
+	glEnableVertexAttribArray(p1.positionAttribute);
+	glDrawArrays(GL_TRIANGLES, 0, 3);
+	glDisableVertexAttribArray(p1.positionAttribute);
+
 	SDL_GL_SwapWindow(displayWindow);
+
 
 }
 

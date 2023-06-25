@@ -1,3 +1,2 @@
 ﻿  main.cpp
-C:\Users\kelly\Documents\GitHub\CS3113\HW2\main.cpp(144,12): warning C4101: 'scale_vector': unreferenced local variable
   SDLProject.vcxproj -> C:\Users\kelly\Documents\GitHub\CS3113\HW2\Debug\SDLProject.exe

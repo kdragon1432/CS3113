@@ -35,7 +35,7 @@
     <Image Include="ball.png">
       <Filter>Source Files</Filter>
     </Image>
-    <Image Include="player2.png">
+    <Image Include="player1.png">
       <Filter>Source Files</Filter>
     </Image>
   </ItemGroup>
