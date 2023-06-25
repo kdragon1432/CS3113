@@ -183,10 +183,10 @@ void process_input(){
 			case SDL_KEYDOWN:
 				switch (event.key.keysym.sym) {
 				case SDLK_UP:
-					ball_movement.y = 1.0f;
+					p2_movement.y = 1.0f;
 					break;
 				case SDLK_DOWN:
-					ball_movement.y = -1.0f;
+					p2_movement.y = -1.0f;
 					break;
 				case SDLK_w:
 					p1_movement.y = 1.0f;
@@ -200,10 +200,10 @@ void process_input(){
 			case SDL_KEYUP:
 				switch (event.key.keysym.sym) {
 				case SDLK_UP:
-					ball_movement.y = 0.0f;
+					p2_movement.y = 0.0f;
 					break;
 				case SDLK_DOWN:
-					ball_movement.y = 0.0f;
+					p2_movement.y = 0.0f;
 					break;
 				case SDLK_w:
 					p1_movement.y = 0.0f;
@@ -221,10 +221,10 @@ void process_input(){
 	const Uint8* key_state = SDL_GetKeyboardState(NULL);
 
 	if (key_state[SDL_SCANCODE_UP]) {
-		ball_movement.y = 1.0f;
+		p2_movement.y = 1.0f;
 	}
 	else if (key_state[SDL_SCANCODE_DOWN]) {
-		ball_movement.y = -1.0f;
+		p2_movement.y = -1.0f;
 	}
 	if (key_state[SDL_SCANCODE_W])
 	{
@@ -235,8 +235,8 @@ void process_input(){
 	}
 
 	// This makes sure that the player can't "cheat" their way into moving faster
-	if (glm::length(ball_movement) > 1.0f){
-		ball_movement = glm::normalize(ball_movement);
+	if (glm::length(p2_movement) > 1.0f){
+		p2_movement = glm::normalize(p2_movement);
 	}
 	if (glm::length(p1_movement) > 1.0f) {
 		p1_movement = glm::normalize(p1_movement);
@@ -255,11 +255,11 @@ void update() {
 	
 
 	// Add direction * units per second * elapsed time
-	ball_position += ball_movement * player_speed * delta_time;
+	p2_position += p2_movement * player_speed * delta_time;
 	p1_position += p1_movement * player_speed * delta_time;
 
-	ball_matrix = glm::mat4(1.0f);
-	ball_matrix = glm::translate(ball_matrix, ball_position);
+	p2_matrix = glm::mat4(1.0f);
+	p2_matrix = glm::translate(p2_matrix, p2_position);
 	p1_matrix = glm::mat4(1.0f);
 	p1_matrix = glm::translate(p1_matrix, p1_position);
 
