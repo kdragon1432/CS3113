@@ -14,15 +14,18 @@
 #include "glm/gtc/matrix_transform.hpp"  // Matrix transformation methods
 #include "ShaderProgram.h"  
 #include "stb_image.h"
+#include "cmath"
+#include <ctime>
+#include <vector>
 
 
 const int	WINDOW_WIDTH = 640,
 WINDOW_HEIGHT = 480;
 
 // Background Color: WHITE
-const float		BG_RED = 0.9f,
-BG_BLUE = 0.9f,
-BG_GREEN = 0.9f,
+const float		BG_RED = 0.8f,
+BG_BLUE = 0.8f,
+BG_GREEN = 0.8f,
 BG_OPACITY = 1.0f;
 
 // Our viewport—or our "camera"'s—position and dimensions
@@ -40,6 +43,8 @@ F_SHADER_PATH[] = "shaders/fragment.glsl";
 
 const char VT_SHADER_PATH[] = "shaders/vertex_textured.glsl",
 FT_SHADER_PATH[] = "shaders/fragment_textured.glsl";
+
+const int FONTBANK_SIZE = 16;
 
 
 SDL_Window* displayWindow;
@@ -78,6 +83,13 @@ glm::vec3 wallUp_position = glm::vec3(0.0f, 3.0f, 0.0f);
 glm::vec3 wallDown_position = glm::vec3(0.0f, -3.0f, 0.0f);
 glm::vec3 wallLeft_position = glm::vec3(-5.0f, 0.0f, 0.0f);
 glm::vec3 wallRight_position = glm::vec3(5.0f, 0.0f, 0.0f);
+
+ShaderProgram win;
+glm::mat4 win_view, win_matrix, win_projection;
+const char FONT_SHEET[] = "font.png";
+GLuint win_texture_id;
+glm::vec3 win_position = glm::vec3(-1.5f, 0.0f, 0.0f);
+int winner = 0;
 
 
 
@@ -136,6 +148,8 @@ void initialize() {
 	BALL.Load(VT_SHADER_PATH, FT_SHADER_PATH);
 	p1.Load(VT_SHADER_PATH, FT_SHADER_PATH);
 	p2.Load(VT_SHADER_PATH, FT_SHADER_PATH);
+	win.Load(VT_SHADER_PATH, FT_SHADER_PATH);
+
 
 	// Initialise our view, model, and projection matrices
 	ball_view = glm::mat4(1.0f);  
@@ -147,6 +161,9 @@ void initialize() {
 	p2_view = glm::mat4(1.0f);
 	p2_matrix = glm::mat4(1.0f);
 	p2_projection = glm::ortho(-5.0f, 5.0f, -3.75f, 3.75f, -1.0f, 1.0f);
+	win_view = glm::mat4(1.0f);
+	win_matrix = glm::mat4(1.0f);
+	win_projection = glm::ortho(-5.0f, 5.0f, -3.75f, 3.75f, -1.0f, 1.0f);
 
 	BALL.SetProjectionMatrix(ball_projection);
 	BALL.SetViewMatrix(ball_view);
@@ -154,12 +171,15 @@ void initialize() {
 	p1.SetViewMatrix(p1_view); 
 	p2.SetProjectionMatrix(p2_projection);
 	p2.SetViewMatrix(p2_view);
+	win.SetProjectionMatrix(win_projection);
+	win.SetViewMatrix(win_view);
 
 
 	// Each object has its own unique ID
 	glUseProgram(BALL.programID);
 	glUseProgram(p1.programID);
 	glUseProgram(p2.programID);
+	glUseProgram(win.programID);
 
 
 	glClearColor(BG_RED, BG_BLUE, BG_GREEN, BG_OPACITY); // Background: WHITE
@@ -167,6 +187,7 @@ void initialize() {
 	ball_texture_id = load_texture(BALL_SPRITE_FILEPATH);
 	p1_texture_id = load_texture(PLAYER1_SPRITE_FILEPATH);
 	p2_texture_id = load_texture(PLAYER2_SPRITE_FILEPATH);
+	win_texture_id = load_texture(FONT_SHEET);
 
 	// enable blending
 	glEnable(GL_BLEND);
@@ -301,10 +322,12 @@ void update() {
 	if (wallLeft_position.x >= ball_position.x) {
 		ball_movement.x = 0.0f;
 		ball_movement.y = 0.0f;
+		winner = 2;
 	}
 	if (wallRight_position.x <= ball_position.x) {
 		ball_movement.x = 0.0f;
 		ball_movement.y = 0.0f;
+		winner = 1;
 	}
 	float p2_Ballx = sqrt(pow((p2_initial.x - ball_position.x), 2));
 	float p1_Ballx = sqrt(pow((p1_initial.x - ball_position.x), 2));
@@ -344,6 +367,68 @@ void update() {
 	}
 	else { frame_counter = rand_num; }
 
+}
+
+void DrawText(ShaderProgram* program, GLuint font_texture_id, std::string text, float screen_size, float spacing, glm::vec3 position)
+{
+	// Scale the size of the fontbank in the UV-plane
+	// We will use this for spacing and positioning
+	float width = 1.0f / FONTBANK_SIZE;
+	float height = 1.0f / FONTBANK_SIZE;
+
+	// Instead of having a single pair of arrays, we'll have a series of pairs—one for each character
+	// Don't forget to include <vector>!
+	std::vector<float> vertices;
+	std::vector<float> texture_coordinates;
+
+	// For every character...
+	for (int i = 0; i < text.size(); i++) {
+		// 1. Get their index in the spritesheet, as well as their offset (i.e. their position
+		//    relative to the whole sentence)
+		int spritesheet_index = (int)text[i];  // ascii value of character
+		float offset = (screen_size + spacing) * i;
+
+		// 2. Using the spritesheet index, we can calculate our U- and V-coordinates
+		float u_coordinate = (float)(spritesheet_index % FONTBANK_SIZE) / FONTBANK_SIZE;
+		float v_coordinate = (float)(spritesheet_index / FONTBANK_SIZE) / FONTBANK_SIZE;
+
+		// 3. Inset the current pair in both vectors
+		vertices.insert(vertices.end(), {
+			offset + (-0.5f * screen_size), 0.5f * screen_size,
+			offset + (-0.5f * screen_size), -0.5f * screen_size,
+			offset + (0.5f * screen_size), 0.5f * screen_size,
+			offset + (0.5f * screen_size), -0.5f * screen_size,
+			offset + (0.5f * screen_size), 0.5f * screen_size,
+			offset + (-0.5f * screen_size), -0.5f * screen_size,
+			});
+
+		texture_coordinates.insert(texture_coordinates.end(), {
+			u_coordinate, v_coordinate,
+			u_coordinate, v_coordinate + height,
+			u_coordinate + width, v_coordinate,
+			u_coordinate + width, v_coordinate + height,
+			u_coordinate + width, v_coordinate,
+			u_coordinate, v_coordinate + height,
+			});
+	}
+
+	// 4. And render all of them using the pairs
+	glm::mat4 model_matrix = glm::mat4(1.0f);
+	model_matrix = glm::translate(model_matrix, position);
+
+	program->SetModelMatrix(model_matrix);
+	glUseProgram(program->programID);
+
+	glVertexAttribPointer(program->positionAttribute, 2, GL_FLOAT, false, 0, vertices.data());
+	glEnableVertexAttribArray(program->positionAttribute);
+	glVertexAttribPointer(program->texCoordAttribute, 2, GL_FLOAT, false, 0, texture_coordinates.data());
+	glEnableVertexAttribArray(program->texCoordAttribute);
+
+	glBindTexture(GL_TEXTURE_2D, font_texture_id);
+	glDrawArrays(GL_TRIANGLES, 0, (int)(text.size() * 6));
+
+	glDisableVertexAttribArray(program->positionAttribute);
+	glDisableVertexAttribArray(program->texCoordAttribute);
 }
 
 void render() {
@@ -425,7 +510,27 @@ void render() {
 	glDisableVertexAttribArray(p2.positionAttribute);
 	glDisableVertexAttribArray(p2.texCoordAttribute);
 
-
+	
+	if (winner == 1) {
+		win.SetModelMatrix(win_matrix);
+		DrawText(&win,
+			win_texture_id,
+			std::string("PLAYER 1 WINS"),
+			0.25f, 0.0f,
+			//float screen_size, 
+			//float spacing, 
+			win_position);
+	}
+	if (winner == 2) {
+		win.SetModelMatrix(win_matrix);
+		DrawText(&win,
+			win_texture_id,
+			std::string("PLAYER 2 WINS"),
+			0.25f, 0.0f,
+			//float screen_size, 
+			//float spacing, 
+			win_position);
+	}
 
 
 

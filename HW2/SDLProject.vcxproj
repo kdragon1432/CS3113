@@ -145,6 +145,7 @@
   </ItemGroup>
   <ItemGroup>
     <Image Include="ball.png" />
+    <Image Include="font.png" />
     <Image Include="player1.png" />
     <Image Include="player2.png" />
   </ItemGroup>

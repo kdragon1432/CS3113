@@ -1,8 +1,9 @@
 ﻿  main.cpp
-C:\Users\kelly\Documents\GitHub\CS3113\HW2\main.cpp(309,17): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
-C:\Users\kelly\Documents\GitHub\CS3113\HW2\main.cpp(310,17): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
-C:\Users\kelly\Documents\GitHub\CS3113\HW2\main.cpp(311,17): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
-C:\Users\kelly\Documents\GitHub\CS3113\HW2\main.cpp(312,17): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
-C:\Users\kelly\Documents\GitHub\CS3113\HW2\main.cpp(313,11): warning C4804: '<': unsafe use of type 'bool' in operation
-C:\Users\kelly\Documents\GitHub\CS3113\HW2\main.cpp(318,16): warning C4804: '<': unsafe use of type 'bool' in operation
+C:\Users\kelly\Documents\GitHub\CS3113\HW2\main.cpp(332,17): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
+C:\Users\kelly\Documents\GitHub\CS3113\HW2\main.cpp(333,17): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
+C:\Users\kelly\Documents\GitHub\CS3113\HW2\main.cpp(334,17): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
+C:\Users\kelly\Documents\GitHub\CS3113\HW2\main.cpp(335,17): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
+C:\Users\kelly\Documents\GitHub\CS3113\HW2\main.cpp(336,11): warning C4804: '<': unsafe use of type 'bool' in operation
+C:\Users\kelly\Documents\GitHub\CS3113\HW2\main.cpp(341,16): warning C4804: '<': unsafe use of type 'bool' in operation
+C:\Users\kelly\Documents\GitHub\CS3113\HW2\main.cpp(385,20): warning C4018: '<': signed/unsigned mismatch
   SDLProject.vcxproj -> C:\Users\kelly\Documents\GitHub\CS3113\HW2\Debug\SDLProject.exe
