@@ -38,5 +38,8 @@
     <Image Include="player1.png">
       <Filter>Source Files</Filter>
     </Image>
+    <Image Include="player2.png">
+      <Filter>Source Files</Filter>
+    </Image>
   </ItemGroup>
 </Project>

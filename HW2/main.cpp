@@ -68,6 +68,17 @@ glm::vec3 p1_movement = glm::vec3(0.0f, 0.0f, 0.0f);
 glm::vec3 p1_orientation = glm::vec3(0.0f, 0.0f, 0.0f);
 glm::vec3 p1_rotation = glm::vec3(0.0f, 0.0f, 0.0f);
 
+ShaderProgram p2;
+glm::mat4 p2_view, p2_matrix, p2_projection;
+const char PLAYER2_SPRITE_FILEPATH[] = "player2.png";
+GLuint p2_texture_id;
+
+glm::vec3 p2_position = glm::vec3(0.0f, 0.0f, 0.0f);
+glm::vec3 p2_movement = glm::vec3(0.0f, 0.0f, 0.0f);
+
+glm::vec3 p2_orientation = glm::vec3(0.0f, 0.0f, 0.0f);
+glm::vec3 p2_rotation = glm::vec3(0.0f, 0.0f, 0.0f);
+
 
 
 
@@ -121,6 +132,7 @@ void initialize() {
 	// LOAD UP OUR SHADERS
 	BALL.Load(VT_SHADER_PATH, FT_SHADER_PATH);
 	p1.Load(VT_SHADER_PATH, FT_SHADER_PATH);
+	p2.Load(VT_SHADER_PATH, FT_SHADER_PATH);
 
 	// Initialise our view, model, and projection matrices
 	ball_view = glm::mat4(1.0f);  
@@ -129,11 +141,16 @@ void initialize() {
 	p1_view = glm::mat4(1.0f);
 	p1_matrix = glm::mat4(1.0f);
 	p1_projection = glm::ortho(-5.0f, 5.0f, -3.75f, 3.75f, -1.0f, 1.0f);
+	p2_view = glm::mat4(1.0f);
+	p2_matrix = glm::mat4(1.0f);
+	p2_projection = glm::ortho(-5.0f, 5.0f, -3.75f, 3.75f, -1.0f, 1.0f);
 
 	BALL.SetProjectionMatrix(ball_projection);
 	BALL.SetViewMatrix(ball_view);
 	p1.SetProjectionMatrix(p1_projection);
-	p1.SetViewMatrix(p1_view);
+	p1.SetViewMatrix(p1_view); 
+	p2.SetProjectionMatrix(p2_projection);
+	p2.SetViewMatrix(p2_view);
 
 
 	//p1.SetColor(1.0f, 0.4f, 0.4f, 1.0f);
@@ -141,12 +158,14 @@ void initialize() {
 	// Each object has its own unique ID
 	glUseProgram(BALL.programID);
 	glUseProgram(p1.programID);
+	glUseProgram(p2.programID);
 
 
 	glClearColor(BG_RED, BG_BLUE, BG_GREEN, BG_OPACITY); // Background: WHITE
 
 	ball_texture_id = load_texture(BALL_SPRITE_FILEPATH);
 	p1_texture_id = load_texture(PLAYER1_SPRITE_FILEPATH);
+	p2_texture_id = load_texture(PLAYER2_SPRITE_FILEPATH);
 
 	// enable blending
 	glEnable(GL_BLEND);
@@ -301,6 +320,31 @@ void render() {
 	glDrawArrays(GL_TRIANGLES, 0, 3);
 	glDisableVertexAttribArray(p1.positionAttribute);
 	glDisableVertexAttribArray(p1.texCoordAttribute);
+
+	p2.SetModelMatrix(p2_matrix);
+
+	float vertices2[] =
+	{
+		4.9f, 0.0f,
+		4.5f, -1.0f,
+		4.5f, 1.0f,
+	};
+
+	float texture_coordinates2[] = {
+		1.0f, 0.5f,
+		0.6f, 0.0f,
+		0.6f, 0.1f,
+
+	};
+
+	glVertexAttribPointer(p2.positionAttribute, 2, GL_FLOAT, false, 0, vertices2);
+	glEnableVertexAttribArray(p2.positionAttribute);
+	glVertexAttribPointer(p2.texCoordAttribute, 2, GL_FLOAT, false, 0, texture_coordinates2);
+	glEnableVertexAttribArray(p2.texCoordAttribute);
+	glBindTexture(GL_TEXTURE_2D, p2_texture_id);
+	glDrawArrays(GL_TRIANGLES, 0, 3);
+	glDisableVertexAttribArray(p2.positionAttribute);
+	glDisableVertexAttribArray(p2.texCoordAttribute);
 
 	SDL_GL_SwapWindow(displayWindow);
 
