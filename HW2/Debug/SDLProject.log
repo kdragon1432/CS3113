@@ -1,9 +1,11 @@
 ﻿  main.cpp
-C:\Users\kelly\Documents\GitHub\CS3113\HW2\main.cpp(341,17): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
-C:\Users\kelly\Documents\GitHub\CS3113\HW2\main.cpp(342,17): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
-C:\Users\kelly\Documents\GitHub\CS3113\HW2\main.cpp(343,17): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
-C:\Users\kelly\Documents\GitHub\CS3113\HW2\main.cpp(344,17): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
-C:\Users\kelly\Documents\GitHub\CS3113\HW2\main.cpp(345,11): warning C4804: '<': unsafe use of type 'bool' in operation
-C:\Users\kelly\Documents\GitHub\CS3113\HW2\main.cpp(350,16): warning C4804: '<': unsafe use of type 'bool' in operation
-C:\Users\kelly\Documents\GitHub\CS3113\HW2\main.cpp(394,20): warning C4018: '<': signed/unsigned mismatch
-  SDLProject.vcxproj -> C:\Users\kelly\Documents\GitHub\CS3113\HW2\Debug\SDLProject.exe
+C:\Users\kelly\OneDrive\Documents\GitHub\CS3113\HW2\main.cpp(341,17): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
+C:\Users\kelly\OneDrive\Documents\GitHub\CS3113\HW2\main.cpp(342,17): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
+C:\Users\kelly\OneDrive\Documents\GitHub\CS3113\HW2\main.cpp(343,17): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
+C:\Users\kelly\OneDrive\Documents\GitHub\CS3113\HW2\main.cpp(344,17): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
+C:\Users\kelly\OneDrive\Documents\GitHub\CS3113\HW2\main.cpp(345,11): warning C4804: '<': unsafe use of type 'bool' in operation
+C:\Users\kelly\OneDrive\Documents\GitHub\CS3113\HW2\main.cpp(350,16): warning C4804: '<': unsafe use of type 'bool' in operation
+C:\Users\kelly\OneDrive\Documents\GitHub\CS3113\HW2\main.cpp(394,20): warning C4018: '<': signed/unsigned mismatch
+  ShaderProgram.cpp
+  Generating Code...
+  SDLProject.vcxproj -> C:\Users\kelly\OneDrive\Documents\GitHub\CS3113\HW2\Debug\SDLProject.exe

@@ -1,0 +1,5 @@
+﻿  main.cpp
+C:\Users\kelly\OneDrive\Documents\GitHub\CS3113\SDLProject\main.cpp(192,15): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
+C:\Users\kelly\OneDrive\Documents\GitHub\CS3113\SDLProject\main.cpp(193,15): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
+C:\Users\kelly\OneDrive\Documents\GitHub\CS3113\SDLProject\main.cpp(262,20): warning C4018: '<': signed/unsigned mismatch
+  SDLProject.vcxproj -> C:\Users\kelly\OneDrive\Documents\GitHub\CS3113\SDLProject\Debug\SDLProject.exe
