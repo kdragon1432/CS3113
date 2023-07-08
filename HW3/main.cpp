@@ -1,3 +1,13 @@
+/**
+* Author: Kelly Dong
+* Assignment: Lunar Lander
+* Date due: 2023-07-07, 11:59pm
+* I pledge that I have completed this assignment without
+* collaborating with anyone else, in conformance with the
+* NYU School of Engineering Policies and Procedures on
+* Academic Misconduct.
+**/
+
 #define GL_SILENCE_DEPRECATION
 #define STB_IMAGE_IMPLEMENTATION
 #define NUMBER_OF_ENEMIES 3
@@ -93,7 +103,7 @@ GLuint load_texture(const char* filepath)
 
 void initialise() {
 	SDL_Init(SDL_INIT_VIDEO);
-	displayWindow = SDL_CreateWindow("Hello, World!", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, WINDOW_WIDTH, WINDOW_HEIGHT, SDL_WINDOW_OPENGL);
+	displayWindow = SDL_CreateWindow("HW3! LUNAR LANDER", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, WINDOW_WIDTH, WINDOW_HEIGHT, SDL_WINDOW_OPENGL);
 	SDL_GLContext context = SDL_GL_CreateContext(displayWindow);
 	SDL_GL_MakeCurrent(displayWindow, context);
 
@@ -192,7 +202,7 @@ void process_input() {
 	float dist_x = pow((g_state.target->get_position().x - g_state.player->get_position().x), 2);
 	float dist_y = pow((g_state.target->get_position().y - g_state.player->get_position().y), 2);
 
-	if (sqrt(dist_x+dist_y) < 0.25f) {
+	if (sqrt(dist_x+dist_y) < 0.3f) {
 		g_state.player->m_movement = glm::vec3(0);
 		g_state.player->m_acceleration = glm::vec3(0);
 		g_state.player->isWinner = 1;

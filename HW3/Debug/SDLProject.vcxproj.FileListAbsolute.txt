@@ -1,1 +1,2 @@
 C:\Users\kelly\OneDrive\Documents\GitHub\CS3113\SDLProject\Debug\SDLProject.exe
+C:\Users\kelly\Documents\GitHub\CS3113\HW3\Debug\SDLProject.exe
