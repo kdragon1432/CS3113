@@ -145,6 +145,20 @@
       <FileType>Document</FileType>
     </CopyFileToFolders>
   </ItemGroup>
+  <ItemGroup>
+    <Image Include="assets\font1.png" />
+    <Image Include="assets\george_0.png" />
+    <Image Include="assets\platformPack_tile027.png" />
+    <Image Include="assets\soph.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Media Include="assets\bounce.wav" />
+    <Media Include="assets\dooblydoo.mp3" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="SDL2_mixer.dll" />
+    <None Include="smpeg2.dll" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

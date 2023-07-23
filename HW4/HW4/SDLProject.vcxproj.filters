@@ -37,4 +37,34 @@
     <CopyFileToFolders Include="glew32.dll" />
     <CopyFileToFolders Include="SDL2.dll" />
   </ItemGroup>
+  <ItemGroup>
+    <Image Include="assets\platformPack_tile027.png">
+      <Filter>Source Files</Filter>
+    </Image>
+    <Image Include="assets\font1.png">
+      <Filter>Source Files</Filter>
+    </Image>
+    <Image Include="assets\george_0.png">
+      <Filter>Source Files</Filter>
+    </Image>
+    <Image Include="assets\soph.png">
+      <Filter>Source Files</Filter>
+    </Image>
+  </ItemGroup>
+  <ItemGroup>
+    <Media Include="assets\bounce.wav">
+      <Filter>Source Files</Filter>
+    </Media>
+    <Media Include="assets\dooblydoo.mp3">
+      <Filter>Source Files</Filter>
+    </Media>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="SDL2_mixer.dll">
+      <Filter>Source Files</Filter>
+    </None>
+    <None Include="smpeg2.dll">
+      <Filter>Source Files</Filter>
+    </None>
+  </ItemGroup>
 </Project>
