@@ -1,3 +1,4 @@
+#include "Map.h"
 
 enum EntityType { PLATFORM, PLAYER, ENEMY };
 enum AIType { WALKER, GUARD };
@@ -7,10 +8,9 @@ class Entity
 {
 private:
     bool m_is_active = true;
-
     EntityType m_entity_type;
-    AIType     m_ai_type;
-    AIState    m_ai_state;
+    AIType m_ai_type;
+    AIState m_ai_state;
 
     int* m_animation_right = NULL; // move to the right
     int* m_animation_left = NULL; // move to the left
@@ -21,8 +21,8 @@ private:
     glm::vec3 m_velocity;
     glm::vec3 m_acceleration;
 
-    float m_width = 1;
-    float m_height = 1;
+    float m_width = 0.8f;
+    float m_height = 0.8f;
 
 public:
     // Static attributes
@@ -33,24 +33,24 @@ public:
         DOWN = 3;
 
     // Existing
-    GLuint    m_texture_id;
+    GLuint m_texture_id;
     glm::mat4 m_model_matrix;
 
     // Translating
-    float     m_speed;
+    float m_speed;
     glm::vec3 m_movement;
 
     // Animating
     int** m_walking = new int* [4] { m_animation_left, m_animation_right, m_animation_up, m_animation_down };
     int* m_animation_indices = NULL;
-    int   m_animation_frames = 0;
-    int   m_animation_index = 0;
+    int m_animation_frames = 0;
+    int m_animation_index = 0;
     float m_animation_time = 0.0f;
-    int   m_animation_cols = 0;
-    int   m_animation_rows = 0;
+    int m_animation_cols = 0;
+    int m_animation_rows = 0;
 
     // Jumping
-    bool  m_is_jumping = false;
+    bool m_is_jumping = false;
     float m_jumping_power = 0;
 
     // Colliding
@@ -64,15 +64,19 @@ public:
     ~Entity();
 
     void draw_sprite_from_texture_atlas(ShaderProgram* program, GLuint texture_id, int index);
-    void update(float delta_time, Entity* player, Entity* collidable_entities, int collidable_entity_count);
+    void update(float delta_time, Entity* player, Entity* objects, int object_count, Map* map); // Now, update should check for both objects in the game AND the map
     void render(ShaderProgram* program);
-
-    void ai_activate(Entity* player);
-    void ai_walk();
+    void activate_ai(Entity* player);
+    void ai_walker();
     void ai_guard(Entity* player);
 
     void const check_collision_y(Entity* collidable_entities, int collidable_entity_count);
     void const check_collision_x(Entity* collidable_entities, int collidable_entity_count);
+
+    // Overloading our methods to check for only the map
+    void const check_collision_y(Map* map);
+    void const check_collision_x(Map* map);
+
     bool const check_collision(Entity* other) const;
 
     void activate() { m_is_active = true; };

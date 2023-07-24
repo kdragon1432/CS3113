@@ -3,8 +3,9 @@
 #define LOG(argument) std::cout << argument << '\n'
 #define GL_GLEXT_PROTOTYPES 1
 #define FIXED_TIMESTEP 0.0166666f
-#define PLATFORM_COUNT 17//11
 #define ENEMY_COUNT 1
+#define LEVEL1_WIDTH 14
+#define LEVEL1_HEIGHT 5
 
 #ifdef _WINDOWS
 #include <GL/glew.h>
@@ -21,20 +22,21 @@
 #include <ctime>
 #include <vector>
 #include "Entity.h"
+#include "Map.h"
 
-// ––––– STRUCTS AND ENUMS ––––– //
+// ————— GAME STATE ————— //
 struct GameState
 {
     Entity* player;
-    Entity* platforms;
     Entity* enemies;
+
+    Map* map;
 
     Mix_Music* bgm;
     Mix_Chunk* jump_sfx;
 };
 
-
-// ––––– CONSTANTS ––––– //
+// ————— CONSTANTS ————— //
 const int WINDOW_WIDTH = 640,
 WINDOW_HEIGHT = 480;
 
@@ -48,37 +50,44 @@ VIEWPORT_Y = 0,
 VIEWPORT_WIDTH = WINDOW_WIDTH,
 VIEWPORT_HEIGHT = WINDOW_HEIGHT;
 
+const char GAME_WINDOW_NAME[] = "Hello, Maps!";
+
 const char V_SHADER_PATH[] = "shaders/vertex_textured.glsl",
 F_SHADER_PATH[] = "shaders/fragment_textured.glsl";
 
 const float MILLISECONDS_IN_SECOND = 1000.0;
 
 const char SPRITESHEET_FILEPATH[] = "assets/george_0.png",
-PLATFORM_FILEPATH[] = "assets/platformPack_tile027.png",
-ENEMY_FILEPATH[] = "assets/soph.png";
-
-const char BGM_FILEPATH[] = "assets/dooblydoo.mp3",
-SFX_FILEPATH[] = "assets/bounce.wav";
+MAP_TILESET_FILEPATH[] = "assets/tileset.png",
+BGM_FILEPATH[] = "assets/dooblydoo.mp3",
+JUMP_SFX_FILEPATH[] = "assets/bounce.wav";
 
 const int NUMBER_OF_TEXTURES = 1;
 const GLint LEVEL_OF_DETAIL = 0;
 const GLint TEXTURE_BORDER = 0;
 
-const float PLATFORM_OFFSET = 5.0f;
+unsigned int LEVEL_1_DATA[] =
+{
+    2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2,
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+    1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+    2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2
+};
 
-// ––––– VARIABLES ––––– //
+// ————— VARIABLES ————— //
 GameState g_state;
 
-SDL_Window* g_display_window;
-bool g_game_is_running = true;
+SDL_Window* m_display_window;
+bool m_game_is_running = true;
 
-ShaderProgram g_program;
-glm::mat4 g_view_matrix, g_projection_matrix;
+ShaderProgram m_program;
+glm::mat4 m_view_matrix, m_projection_matrix;
 
-float g_previous_ticks = 0.0f;
-float g_accumulator = 0.0f;
+float m_previous_ticks = 0.0f,
+m_accumulator = 0.0f;
 
-// ––––– GENERAL FUNCTIONS ––––– //
+// ————— GENERAL FUNCTIONS ————— //
 GLuint load_texture(const char* filepath)
 {
     int width, height, number_of_components;
@@ -90,81 +99,61 @@ GLuint load_texture(const char* filepath)
         assert(false);
     }
 
-    GLuint textureID;
-    glGenTextures(NUMBER_OF_TEXTURES, &textureID);
-    glBindTexture(GL_TEXTURE_2D, textureID);
+    GLuint texture_id;
+    glGenTextures(NUMBER_OF_TEXTURES, &texture_id);
+    glBindTexture(GL_TEXTURE_2D, texture_id);
     glTexImage2D(GL_TEXTURE_2D, LEVEL_OF_DETAIL, GL_RGBA, width, height, TEXTURE_BORDER, GL_RGBA, GL_UNSIGNED_BYTE, image);
 
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
 
     stbi_image_free(image);
 
-    return textureID;
+    return texture_id;
 }
 
 void initialise()
 {
-    // ––––– GENERAL STUFF ––––– //
+    // ————— GENERAL ————— //
     SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO);
-    g_display_window = SDL_CreateWindow("Hello, AI!",
+    m_display_window = SDL_CreateWindow(GAME_WINDOW_NAME,
         SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
         WINDOW_WIDTH, WINDOW_HEIGHT,
         SDL_WINDOW_OPENGL);
 
-    SDL_GLContext context = SDL_GL_CreateContext(g_display_window);
-    SDL_GL_MakeCurrent(g_display_window, context);
+    SDL_GLContext context = SDL_GL_CreateContext(m_display_window);
+    SDL_GL_MakeCurrent(m_display_window, context);
 
 #ifdef _WINDOWS
     glewInit();
 #endif
-    // ––––– VIDEO STUFF ––––– //
+
+    // ————— VIDEO SETUP ————— //
     glViewport(VIEWPORT_X, VIEWPORT_Y, VIEWPORT_WIDTH, VIEWPORT_HEIGHT);
 
-    g_program.Load(V_SHADER_PATH, F_SHADER_PATH);
+    m_program.Load(V_SHADER_PATH, F_SHADER_PATH);
 
-    g_view_matrix = glm::mat4(1.0f);
-    g_projection_matrix = glm::ortho(-5.0f, 5.0f, -3.75f, 3.75f, -1.0f, 1.0f);
+    m_view_matrix = glm::mat4(1.0f);
+    m_projection_matrix = glm::ortho(-5.0f, 5.0f, -3.75f, 3.75f, -1.0f, 1.0f);
 
-    g_program.SetProjectionMatrix(g_projection_matrix);
-    g_program.SetViewMatrix(g_view_matrix);
+    m_program.SetProjectionMatrix(m_projection_matrix);
+    m_program.SetViewMatrix(m_view_matrix);
 
-    glUseProgram(g_program.programID);
+    glUseProgram(m_program.programID);
 
     glClearColor(BG_RED, BG_BLUE, BG_GREEN, BG_OPACITY);
 
-    // ––––– PLATFORM ––––– //
-    GLuint platform_texture_id = load_texture(PLATFORM_FILEPATH);
+    // ————— MAP SET-UP ————— //
+    GLuint map_texture_id = load_texture(MAP_TILESET_FILEPATH);
+    g_state.map = new Map(LEVEL1_WIDTH, LEVEL1_HEIGHT, LEVEL_1_DATA, map_texture_id, 1.0f, 4, 1);
 
-    g_state.platforms = new Entity[PLATFORM_COUNT];
-
-    for (int i = 0; i < 11; i++)
-    {
-        g_state.platforms[i].set_entity_type(PLATFORM);
-        g_state.platforms[i].m_texture_id = platform_texture_id;
-        g_state.platforms[i].set_position(glm::vec3(i - PLATFORM_OFFSET, -3.5f, 0.0f));
-        g_state.platforms[i].set_width(0.4f);
-        g_state.platforms[i].update(0.0f, NULL, NULL, 0);
-    }
-
-    int tmp = 11;
-    for (int i = 11; i < 17; i++) {
-        g_state.platforms[i].set_entity_type(PLATFORM);
-        g_state.platforms[i].m_texture_id = platform_texture_id;
-        g_state.platforms[i].set_position(glm::vec3(tmp - PLATFORM_OFFSET, -1.5f, 0.0f));
-        tmp = tmp - 1;
-        g_state.platforms[i].set_width(0.4f);
-        g_state.platforms[i].update(0.0f, NULL, NULL, 0);
-    }
-
-    // ––––– GEORGE ––––– //
+    // ————— GEORGE SET-UP ————— //
     // Existing
     g_state.player = new Entity();
     g_state.player->set_entity_type(PLAYER);
-    g_state.player->set_position(glm::vec3(-2.0f, 0.0f, 0.0f));
+    g_state.player->set_position(glm::vec3(0.0f, 0.0f, 0.0f));
     g_state.player->set_movement(glm::vec3(0.0f));
     g_state.player->set_speed(2.5f);
     g_state.player->set_acceleration(glm::vec3(0.0f, -9.81f, 0.0f));
@@ -176,41 +165,28 @@ void initialise()
     g_state.player->m_walking[g_state.player->UP] = new int[4] { 2, 6, 10, 14 };
     g_state.player->m_walking[g_state.player->DOWN] = new int[4] { 0, 4, 8, 12 };
 
-    g_state.player->m_animation_indices = g_state.player->m_walking[g_state.player->RIGHT];  // start George looking right
+    g_state.player->m_animation_indices = g_state.player->m_walking[g_state.player->RIGHT];  // start George looking left
     g_state.player->m_animation_frames = 4;
     g_state.player->m_animation_index = 0;
     g_state.player->m_animation_time = 0.0f;
     g_state.player->m_animation_cols = 4;
     g_state.player->m_animation_rows = 4;
-    g_state.player->set_height(1.0f);
-    g_state.player->set_width(1.0f);
+    g_state.player->set_height(0.8f);
+    g_state.player->set_width(0.8f);
 
     // Jumping
-    g_state.player->set_jumping_power(10.0f);
+    g_state.player->m_jumping_power = 5.0f;
 
-    // ––––– SOPHIE ––––– //
-    GLuint enemy_texture_id = load_texture(ENEMY_FILEPATH);
 
-    g_state.enemies = new Entity[ENEMY_COUNT];
-    g_state.enemies[0].set_entity_type(ENEMY);
-    g_state.enemies[0].set_ai_type(GUARD);
-    g_state.enemies[0].set_ai_state(IDLE);
-    g_state.enemies[0].m_texture_id = enemy_texture_id;
-    g_state.enemies[0].set_position(glm::vec3(3.0f, 0.0f, 0.0f));
-    g_state.enemies[0].set_movement(glm::vec3(0.0f));
-    g_state.enemies[0].set_speed(1.0f);
-    g_state.enemies[0].set_acceleration(glm::vec3(0.0f, -9.81f, 0.0f));
-
-    // ––––– AUDIO STUFF ––––– //
     Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 4096);
 
     g_state.bgm = Mix_LoadMUS(BGM_FILEPATH);
     Mix_PlayMusic(g_state.bgm, -1);
-    Mix_VolumeMusic(MIX_MAX_VOLUME / 4.0f);
+    Mix_VolumeMusic(MIX_MAX_VOLUME / 16.0f);
 
-    g_state.jump_sfx = Mix_LoadWAV(SFX_FILEPATH);
+    g_state.jump_sfx = Mix_LoadWAV(JUMP_SFX_FILEPATH);
 
-    // ––––– GENERAL STUFF ––––– //
+    // ————— BLENDING ————— //
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 }
@@ -223,17 +199,16 @@ void process_input()
     while (SDL_PollEvent(&event))
     {
         switch (event.type) {
-            // End game
         case SDL_QUIT:
         case SDL_WINDOWEVENT_CLOSE:
-            g_game_is_running = false;
+            m_game_is_running = false;
             break;
 
         case SDL_KEYDOWN:
             switch (event.key.keysym.sym) {
             case SDLK_q:
                 // Quit the game with a keystroke
-                g_game_is_running = false;
+                m_game_is_running = false;
                 break;
 
             case SDLK_SPACE:
@@ -267,6 +242,7 @@ void process_input()
         g_state.player->m_animation_indices = g_state.player->m_walking[g_state.player->RIGHT];
     }
 
+    // This makes sure that the player can't move faster diagonally
     if (glm::length(g_state.player->m_movement) > 1.0f)
     {
         g_state.player->m_movement = glm::normalize(g_state.player->m_movement);
@@ -276,57 +252,58 @@ void process_input()
 void update()
 {
     float ticks = (float)SDL_GetTicks() / MILLISECONDS_IN_SECOND;
-    float delta_time = ticks - g_previous_ticks;
-    g_previous_ticks = ticks;
+    float delta_time = ticks - m_previous_ticks;
+    m_previous_ticks = ticks;
 
-    delta_time += g_accumulator;
+    delta_time += m_accumulator;
 
     if (delta_time < FIXED_TIMESTEP)
     {
-        g_accumulator = delta_time;
+        m_accumulator = delta_time;
         return;
     }
 
-    while (delta_time >= FIXED_TIMESTEP) {
-        g_state.player->update(FIXED_TIMESTEP, g_state.player, g_state.platforms, PLATFORM_COUNT);
-
-        for (int i = 0; i < ENEMY_COUNT; i++) g_state.enemies[i].update(FIXED_TIMESTEP, g_state.player, g_state.platforms, PLATFORM_COUNT);
-
+    while (delta_time >= FIXED_TIMESTEP)
+    {
+        g_state.player->update(FIXED_TIMESTEP, g_state.player, NULL, 0, g_state.map);
         delta_time -= FIXED_TIMESTEP;
     }
 
-    g_accumulator = delta_time;
+    m_accumulator = delta_time;
+
+    m_view_matrix = glm::mat4(1.0f);
+    m_view_matrix = glm::translate(m_view_matrix, glm::vec3(-g_state.player->get_position().x, 0.0f, 0.0f));
 }
 
 void render()
 {
+    m_program.SetViewMatrix(m_view_matrix);
+
     glClear(GL_COLOR_BUFFER_BIT);
 
-    g_state.player->render(&g_program);
+    g_state.player->render(&m_program);
+    g_state.map->render(&m_program);
 
-    for (int i = 0; i < PLATFORM_COUNT; i++) g_state.platforms[i].render(&g_program);
-    for (int i = 0; i < ENEMY_COUNT; i++)    g_state.enemies[i].render(&g_program);
-
-    SDL_GL_SwapWindow(g_display_window);
+    SDL_GL_SwapWindow(m_display_window);
 }
 
 void shutdown()
 {
     SDL_Quit();
 
-    delete[] g_state.platforms;
     delete[] g_state.enemies;
     delete    g_state.player;
+    delete    g_state.map;
     Mix_FreeChunk(g_state.jump_sfx);
     Mix_FreeMusic(g_state.bgm);
 }
 
-// ––––– GAME LOOP ––––– //
+// ————— GAME LOOP ————— //
 int main(int argc, char* argv[])
 {
     initialise();
 
-    while (g_game_is_running)
+    while (m_game_is_running)
     {
         process_input();
         update();
