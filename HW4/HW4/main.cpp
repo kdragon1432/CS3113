@@ -64,7 +64,7 @@ const char SPRITESHEET_FILEPATH[] = "assets/character_005.png",
 ENEMY_FILEPATH[] = "assets/shipYellow.png",
 MAP_TILESET_FILEPATH[] = "assets/tilemap.png",
 BGM_FILEPATH[] = "assets/space_jazz.mp3",
-JUMP_SFX_FILEPATH[] = "assets/jump.wav";
+JUMP_SFX_FILEPATH[] = "assets/bounce_wall.wav";
 
 const int NUMBER_OF_TEXTURES = 1;
 const GLint LEVEL_OF_DETAIL = 0;
