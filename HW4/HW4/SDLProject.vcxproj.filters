@@ -44,19 +44,19 @@
     <CopyFileToFolders Include="SDL2.dll" />
   </ItemGroup>
   <ItemGroup>
-    <Image Include="assets\platformPack_tile027.png">
-      <Filter>Source Files</Filter>
-    </Image>
     <Image Include="assets\font1.png">
       <Filter>Source Files</Filter>
     </Image>
-    <Image Include="assets\george_0.png">
+    <Image Include="assets\tilemap.png">
       <Filter>Source Files</Filter>
     </Image>
-    <Image Include="assets\soph.png">
+    <Image Include="assets\Character_005.png">
       <Filter>Source Files</Filter>
     </Image>
-    <Image Include="assets\tileset.png">
+    <Image Include="assets\shipYellow.png">
+      <Filter>Source Files</Filter>
+    </Image>
+    <Image Include="assets\font2.png">
       <Filter>Source Files</Filter>
     </Image>
   </ItemGroup>
@@ -64,7 +64,13 @@
     <Media Include="assets\bounce.wav">
       <Filter>Source Files</Filter>
     </Media>
-    <Media Include="assets\dooblydoo.mp3">
+    <Media Include="assets\space_jazz.mp3">
+      <Filter>Source Files</Filter>
+    </Media>
+    <Media Include="assets\bounce_wall.wav">
+      <Filter>Source Files</Filter>
+    </Media>
+    <Media Include="assets\jump.wav">
       <Filter>Source Files</Filter>
     </Media>
   </ItemGroup>

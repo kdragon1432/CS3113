@@ -1,8 +1,8 @@
 #include "Map.h"
 
-enum EntityType { PLATFORM, PLAYER, ENEMY };
+enum EntityType { PLATFORM, PLAYER, ENEMIES };
 enum AIType { WALKER, GUARD };
-enum AIState { WALKING, IDLE, ATTACKING };
+enum AIState { WALKING, IDLE, JUMPER, PATROL};
 
 class Entity
 {
@@ -25,6 +25,9 @@ private:
     float m_height = 0.8f;
 
 public:
+    int isWinner = 0;
+    bool isPlayer = false;
+
     // Static attributes
     static const int SECONDS_PER_FRAME = 4;
     static const int LEFT = 0,
@@ -70,12 +73,15 @@ public:
     void ai_walker();
     void ai_guard(Entity* player);
 
+    void const check_player_collision(Entity* player, Entity* objects, int object_count);
+
     void const check_collision_y(Entity* collidable_entities, int collidable_entity_count);
     void const check_collision_x(Entity* collidable_entities, int collidable_entity_count);
 
     // Overloading our methods to check for only the map
     void const check_collision_y(Map* map);
     void const check_collision_x(Map* map);
+
 
     bool const check_collision(Entity* other) const;
 

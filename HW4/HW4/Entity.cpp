@@ -15,6 +15,8 @@
 
 Entity::Entity()
 {
+    isWinner = 0;
+    isPlayer = false;
     m_position = glm::vec3(0.0f);
     m_velocity = glm::vec3(0.0f);
     m_acceleration = glm::vec3(0.0f);
@@ -98,7 +100,7 @@ void Entity::ai_guard(Entity* player)
 {
     switch (m_ai_state) {
     case IDLE:
-        if (glm::distance(m_position, player->get_position()) < 3.0f) m_ai_state = WALKING;
+        m_movement = glm::vec3(0.0f);
         break;
 
     case WALKING:
@@ -110,7 +112,17 @@ void Entity::ai_guard(Entity* player)
         }
         break;
 
-    case ATTACKING:
+    case JUMPER:
+            //m_movement = glm::vec3(0.0f, 10.0f, 0.0f);
+        if (m_position.y <= -2) {
+            m_velocity = glm::vec3(0.0f, 8.0f, 0.0f);
+        }
+        break;
+
+    case PATROL:
+        if (m_position.x <= 6) { m_movement.x = 1; }
+        if (m_position.x >= 9) { m_movement.x = -1;}
+        
         break;
 
     default:
@@ -127,7 +139,7 @@ void Entity::update(float delta_time, Entity* player, Entity* objects, int objec
     m_collided_left = false;
     m_collided_right = false;
 
-    if (m_entity_type == ENEMY) activate_ai(player);
+    if (m_entity_type == ENEMIES) activate_ai(player);
 
     if (m_animation_indices != NULL)
     {
@@ -161,7 +173,6 @@ void Entity::update(float delta_time, Entity* player, Entity* objects, int objec
     m_position.x += m_velocity.x * delta_time;
     check_collision_x(objects, object_count);
     check_collision_x(map);
-
     if (m_is_jumping)
     {
         m_is_jumping = false;
@@ -171,6 +182,20 @@ void Entity::update(float delta_time, Entity* player, Entity* objects, int objec
 
     m_model_matrix = glm::mat4(1.0f);
     m_model_matrix = glm::translate(m_model_matrix, m_position);
+}
+
+
+void const Entity::check_player_collision(Entity* player, Entity* objects, int object_count)
+{
+    for (int i = 0; i < object_count; i++)
+    {
+        //Entity* objects = &objects[i];
+
+        if (player->check_collision(&objects[i]))
+        {
+            player->isWinner = 1;
+        }
+    }
 }
 
 void const Entity::check_collision_y(Entity* collidable_entities, int collidable_entity_count)
