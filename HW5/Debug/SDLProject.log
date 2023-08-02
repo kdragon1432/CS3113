@@ -1,6 +1,0 @@
-﻿  main.cpp
-C:\Users\kelly\Documents\GitHub\CS3113\HW4\HW4\Entity.h(100,58): warning C4244: 'return': conversion from 'const float' to 'const int', possible loss of data
-C:\Users\kelly\Documents\GitHub\CS3113\HW4\HW4\Entity.h(101,58): warning C4244: 'return': conversion from 'const float' to 'const int', possible loss of data
-C:\Users\kelly\Documents\GitHub\CS3113\HW4\HW4\main.cpp(228,35): warning C4244: 'argument': conversion from 'float' to 'int', possible loss of data
-C:\Users\kelly\Documents\GitHub\CS3113\HW4\HW4\main.cpp(389,23): warning C4018: '<': signed/unsigned mismatch
-  SDLProject.vcxproj -> C:\Users\kelly\Documents\GitHub\CS3113\HW4\HW4\Debug\SDLProject.exe
