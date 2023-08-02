@@ -1,3 +1,7 @@
-﻿  main.cpp
+﻿  Entity.cpp
+  main.cpp
 C:\Users\kelly\Documents\GitHub\CS3113\HW5\main.cpp(52,12): warning C4101: 'event': unreferenced local variable
+  Map.cpp
+  Utility.cpp
+  Generating Code...
   SDLProject.vcxproj -> C:\Users\kelly\Documents\GitHub\CS3113\HW5\Debug\SDLProject.exe
