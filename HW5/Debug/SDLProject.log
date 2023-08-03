@@ -1,7 +1,5 @@
-﻿  Entity.cpp
-  main.cpp
-C:\Users\kelly\Documents\GitHub\CS3113\HW5\main.cpp(52,12): warning C4101: 'event': unreferenced local variable
-  Map.cpp
-  Utility.cpp
-  Generating Code...
+﻿  LevelC.cpp
+C:\Users\kelly\Documents\GitHub\CS3113\HW5\Entity.h(93,58): warning C4244: 'return': conversion from 'const float' to 'const int', possible loss of data
+C:\Users\kelly\Documents\GitHub\CS3113\HW5\Entity.h(94,58): warning C4244: 'return': conversion from 'const float' to 'const int', possible loss of data
+C:\Users\kelly\Documents\GitHub\CS3113\HW5\LevelC.cpp(89,21): warning C4244: 'argument': conversion from 'float' to 'int', possible loss of data
   SDLProject.vcxproj -> C:\Users\kelly\Documents\GitHub\CS3113\HW5\Debug\SDLProject.exe
