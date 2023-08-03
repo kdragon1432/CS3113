@@ -162,14 +162,14 @@
     </CopyFileToFolders>
   </ItemGroup>
   <ItemGroup>
-    <Media Include="assets\bounce.wav" />
-    <Media Include="assets\dooblydoo.mp3" />
+    <Media Include="assets\bounce1.wav" />
+    <Media Include="assets\space_jazz.mp3" />
   </ItemGroup>
   <ItemGroup>
-    <Image Include="assets\font1.png" />
-    <Image Include="assets\george_0.png" />
-    <Image Include="assets\platformPack_tile027.png" />
-    <Image Include="assets\soph.png" />
+    <Image Include="assets\Character_005.png" />
+    <Image Include="assets\font2.png" />
+    <Image Include="assets\shipYellow.png" />
+    <Image Include="assets\tilemap.png" />
     <Image Include="assets\tileset.png" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

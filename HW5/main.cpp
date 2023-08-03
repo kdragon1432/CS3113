@@ -1,3 +1,12 @@
+/**
+* Author: Kelly Dong
+* Assignment: Platformer
+* Date due: 2023-08-01, 11:59pm
+* I pledge that I have completed this assignment without
+* collaborating with anyone else, in conformance with the
+* NYU School of Engineering Policies and Procedures on
+* Academic Misconduct.
+**/
 #define GL_SILENCE_DEPRECATION
 #define GL_GLEXT_PROTOTYPES 1
 #define FIXED_TIMESTEP 0.0166666f
@@ -58,6 +67,9 @@ LevelC* g_levelC;
 Effects* g_effects;
 Scene* g_levels[4];
 
+int number_of_lives = 3;
+//int freeze = 0;
+
 SDL_Window* g_display_window;
 bool g_game_is_running = true;
 
@@ -79,7 +91,7 @@ void switch_to_scene(Scene* scene)
 void initialise()
 {
     SDL_Init(SDL_INIT_VIDEO | SDL_INIT_AUDIO);
-    g_display_window = SDL_CreateWindow("Hello, Special Effects!",
+    g_display_window = SDL_CreateWindow("HW5!",
         SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
         WINDOW_WIDTH, WINDOW_HEIGHT,
         SDL_WINDOW_OPENGL);
@@ -140,7 +152,6 @@ void process_input()
         case SDL_WINDOWEVENT_CLOSE:
             g_game_is_running = false;
             break;
-
         case SDL_KEYDOWN:
             switch (event.key.keysym.sym) {
             case SDLK_q:
@@ -151,6 +162,7 @@ void process_input()
                 if (g_current_scene->m_state.current_scene_id == 0) {
                     g_current_scene->m_state.next_scene_id = 1;
                 }
+                break;
             case SDLK_SPACE:
                 // Jump
                 if (g_current_scene->m_state.player->m_collided_bottom)
@@ -203,10 +215,11 @@ void update()
     }
 
     while (delta_time >= FIXED_TIMESTEP) {
-        g_current_scene->update(FIXED_TIMESTEP);
-        g_effects->update(FIXED_TIMESTEP);
-
-        //if (g_is_colliding_bottom == false && g_current_scene->m_state.player->m_collided_bottom) g_effects->start(SHAKE, 1.0f);
+            if (number_of_lives - (g_current_scene->m_state.player->lost) > 0) {
+                g_current_scene->update(FIXED_TIMESTEP);
+                g_effects->update(FIXED_TIMESTEP);
+            }
+        if (g_is_colliding_bottom == false && g_current_scene->m_state.player->m_collided_bottom) g_effects->start(SHAKE, 1.0f);
 
         g_is_colliding_bottom = g_current_scene->m_state.player->m_collided_bottom;
 
@@ -225,7 +238,11 @@ void update()
         g_view_matrix = glm::translate(g_view_matrix, glm::vec3(-5, 3.75, 0));
     }
 
-    if (g_current_scene == g_levelA && g_current_scene->m_state.player->get_position().y < -10.0f) switch_to_scene(g_levelB);
+
+    
+
+
+    //if (g_current_scene == g_levelA && g_current_scene->m_state.player->get_position().y < -10.0f) switch_to_scene(g_levelB);
 
     g_view_matrix = glm::translate(g_view_matrix, g_effects->m_view_offset);
 }
@@ -237,6 +254,27 @@ void render()
 
     glUseProgram(g_program.programID);
     g_current_scene->render(&g_program);
+
+    int tmp = g_current_scene->m_state.player->lost;
+    if (number_of_lives-tmp == 3)
+    {
+        Utility::draw_text(&g_program, Utility::load_texture("assets/font2.png"), "LIFE 3", 0.25f, 0.00f, glm::vec3(g_current_scene->m_state.player->get_position().x - .5, -0.5f, 0.0f));
+    }
+    if (number_of_lives-tmp == 2)
+    {
+        Utility::draw_text(&g_program, Utility::load_texture("assets/font2.png"), "LIFE 2", 0.25f, 0.00f, glm::vec3(g_current_scene->m_state.player->get_position().x - .5, -0.5f, 0.0f));
+    }
+    if (number_of_lives-tmp == 1)
+    {
+        Utility::draw_text(&g_program, Utility::load_texture("assets/font2.png"), "LIFE 1", 0.25f, 0.00f, glm::vec3(g_current_scene->m_state.player->get_position().x - .5, -0.5f, 0.0f));
+    }
+    if (number_of_lives-tmp == 0)
+    {
+        Utility::draw_text(&g_program, Utility::load_texture("assets/font2.png"), "YOU LOSE|", 0.25f, 0.00f, glm::vec3(g_current_scene->m_state.player->get_position().x - .5, -0.5f, 0.0f));
+        Utility::draw_text(&g_program, Utility::load_texture("assets/font2.png"), "YOU LOSE!", 0.55f, 0.00f, glm::vec3(3.0f, -3.0f, 0.0f));
+        Utility::draw_text(&g_program, Utility::load_texture("assets/font2.png"), "YOU LOSE!", 0.55f, 0.00f, glm::vec3(14.0f, -3.0f, 0.0f));
+    }
+
     g_effects->render();
 
     SDL_GL_SwapWindow(g_display_window);
@@ -263,8 +301,11 @@ int main(int argc, char* argv[])
         process_input();
         update();
 
-        if (g_current_scene->m_state.next_scene_id >= 0) switch_to_scene(g_levels[g_current_scene->m_state.next_scene_id]);
-
+        if (g_current_scene->m_state.next_scene_id >= 0)
+        {
+            number_of_lives = number_of_lives - (g_current_scene->m_state.player->lost);
+            switch_to_scene(g_levels[g_current_scene->m_state.next_scene_id]);
+        }
         render();
     }
 
