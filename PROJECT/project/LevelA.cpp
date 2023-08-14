@@ -1,3 +1,12 @@
+/**
+* Author: Kelly Dong
+* Assignment: Alien Shooter
+* Date due: 2023-08-10, 1:00pm
+* I pledge that I have completed this assignment without
+* collaborating with anyone else, in conformance with the
+* NYU School of Engineering Policies and Procedures on
+* Academic Misconduct.
+**/
 #include "LevelA.h"
 #include "Utility.h"
 //include "main.cpp"
@@ -202,7 +211,7 @@ void LevelA::initialise()
     m_state.enemies[9].m_texture_id = enemy_texture_id;
     m_state.enemies[9].set_ai_type(GUARD);
     m_state.enemies[9].set_ai_state(IDLE);
-    m_state.enemies[9].set_position(glm::vec3(43.0f, -3.5f, 0.0f)); 
+    m_state.enemies[9].set_position(glm::vec3(42.0f, -3.5f, 0.0f)); 
     m_state.enemies[9].set_movement(glm::vec3(0.0f));
     m_state.enemies[9].set_speed(3.0f);
     m_state.enemies[9].set_acceleration(glm::vec3(0.0f, 0.0f, 0.0f));

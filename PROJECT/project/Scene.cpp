@@ -1,7 +1,7 @@
 /**
 * Author: Kelly Dong
-* Assignment: Platformer
-* Date due: 2023-08-01, 11:59pm
+* Assignment: Alien Shooter
+* Date due: 2023-08-10, 1:00pm
 * I pledge that I have completed this assignment without
 * collaborating with anyone else, in conformance with the
 * NYU School of Engineering Policies and Procedures on
